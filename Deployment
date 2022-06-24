@@ -1,0 +1,72 @@
+[root@ip-172-31-20-227 pal-assesment]# kubectl get nodes
+NAME                                               STATUS   ROLES    AGE   VERSION
+ip-172-31-20-227.ap-southeast-1.compute.internal   Ready    master   9d    v1.18.5
+ip-172-31-27-96.ap-southeast-1.compute.internal    Ready    <none>   9d    v1.18.5
+[root@ip-172-31-20-227 pal-assesment]# kubectl get pods -A
+NAMESPACE     NAME                                                                       READY   STATUS    RESTARTS   AGE
+kube-system   calico-etcd-nrr4b                                                          1/1     Running   0          9d
+kube-system   calico-kube-controllers-7997dc8d7b-s2zqx                                   1/1     Running   1          9d
+kube-system   calico-node-nn2dm                                                          2/2     Running   3          9d
+kube-system   calico-node-qdl85                                                          2/2     Running   2          9d
+kube-system   coredns-66bff467f8-d6vsk                                                   1/1     Running   0          9d
+kube-system   coredns-66bff467f8-tkw5p                                                   1/1     Running   0          9d
+kube-system   etcd-ip-172-31-20-227.ap-southeast-1.compute.internal                      1/1     Running   0          9d
+kube-system   kube-apiserver-ip-172-31-20-227.ap-southeast-1.compute.internal            1/1     Running   0          9d
+kube-system   kube-controller-manager-ip-172-31-20-227.ap-southeast-1.compute.internal   1/1     Running   0          9d
+kube-system   kube-proxy-njzz4                                                           1/1     Running   0          9d
+kube-system   kube-proxy-trl2g                                                           1/1     Running   0          9d
+kube-system   kube-scheduler-ip-172-31-20-227.ap-southeast-1.compute.internal            1/1     Running   0          9d
+[root@ip-172-31-20-227 pal-assesment]# kubectl get ns
+NAME              STATUS   AGE
+default           Active   9d
+kube-node-lease   Active   9d
+kube-public       Active   9d
+kube-system       Active   9d
+santhosh          Active   8d
+[root@ip-172-31-20-227 pal-assesment]# kubectl create ns palani
+namespace/palani created
+[root@ip-172-31-20-227 pal-assesment]# kubectl get deploy -A
+NAMESPACE     NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
+kube-system   calico-kube-controllers   1/1     1            1           9d
+kube-system   coredns                   2/2     2            2           9d
+
+[root@ip-172-31-20-227 pal-assesment]# kubectl create deploy pal-deploy --image=nginx -n palani
+deployment.apps/pal-deploy created
+
+[root@ip-172-31-20-227 pal-assesment]# kubectl get deploy -n palani
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+pal-deploy   1/1     1            1           21s
+
+[root@ip-172-31-20-227 pal-assesment]# kubectl describe deploy pal-deploy -n palani
+Name:                   pal-deploy
+Namespace:              palani
+CreationTimestamp:      Fri, 24 Jun 2022 19:11:37 +0000
+Labels:                 app=pal-deploy
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=pal-deploy
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=pal-deploy
+  Containers:
+   nginx:
+    Image:        nginx
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   pal-deploy-7c854749c4 (1/1 replicas created)
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  5m47s  deployment-controller  Scaled up replica set pal-deploy-7c854749c4 to 1
+
