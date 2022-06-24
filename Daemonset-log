@@ -1,0 +1,57 @@
+
+DaemonSets are used to ensure that kubernetes nodes run a copy of a pod.
+when new node added to the cluster, a pod gets added. uses of a DaemonSet are:
+
+cluster storage daemon on every node
+logs collection daemon on every node
+node monitoring daemon on every node
+
+[root@ip-172-31-20-227 ec2-user]# kubectl get nodes
+NAME                                               STATUS   ROLES    AGE   VERSION
+ip-172-31-20-227.ap-southeast-1.compute.internal   Ready    master   9d    v1.18.5
+ip-172-31-27-96.ap-southeast-1.compute.internal    Ready    <none>   9d    v1.18.5
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]# kubectl describe nodes ip-172-31-20-227.ap-southeast-1.compute.internal | grep -i taint
+Taints:             node-role.kubernetes.io/master:NoSchedule
+
+Taint added as Toleration in script , so that Pod can be created in masternode as well.
+
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]# kubectl get nodes
+NAME                                               STATUS   ROLES    AGE   VERSION
+ip-172-31-20-227.ap-southeast-1.compute.internal   Ready    master   9d    v1.18.5
+ip-172-31-27-96.ap-southeast-1.compute.internal    Ready    <none>   9d    v1.18.5
+[root@ip-172-31-20-227 ec2-user]# kubectl describe nodes ip-172-31-27-96.ap-southeast-1.compute.internal | grep -i taint
+Taints:             <none>
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]# ls -ltr
+total 16
+drwxr-xr-x 20 root root  4096 Jun 15 05:59 kubernetes-training
+-rw-r--r--  1 root root     0 Jun 16 05:04 kubia-manual-with-labels.yaml
+-rw-r--r--  1 root root     0 Jun 16 05:26 kubia-manual.yaml
+-rwx------  1 root root 11156 Jun 23 05:36 get_helm.sh
+drwxr-xr-x  2 root root    25 Jun 24 15:10 pal-assesment
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]# cd pal-assesment/
+[root@ip-172-31-20-227 pal-assesment]#
+[root@ip-172-31-20-227 pal-assesment]# vi daemon.yaml
+[root@ip-172-31-20-227 pal-assesment]#
+[root@ip-172-31-20-227 pal-assesment]# kubectl create ns palani
+namespace/palani created
+[root@ip-172-31-20-227 pal-assesment]# vi daemon.yaml
+[root@ip-172-31-20-227 pal-assesment]# kubectl apply -f daemon.yaml
+daemonset.apps/fluentd-elasticsearch created
+[root@ip-172-31-20-227 pal-assesment]# kubectl get pods -n palani
+NAME                          READY   STATUS              RESTARTS   AGE
+fluentd-elasticsearch-wjphv   0/1     ContainerCreating   0          19s
+fluentd-elasticsearch-zq8jv   1/1     Running             0          19s
+[root@ip-172-31-20-227 pal-assesment]# kubectl get pods -n palani
+NAME                          READY   STATUS    RESTARTS   AGE
+fluentd-elasticsearch-wjphv   1/1     Running   0          26s
+fluentd-elasticsearch-zq8jv   1/1     Running   0          26s
+[root@ip-172-31-20-227 pal-assesment]#
+[root@ip-172-31-20-227 pal-assesment]# kubectl get daemonset -n palani
+NAME                    DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+fluentd-elasticsearch   2         2         2       2            2           <none>          81s
+
+# As expected total 2 pods are created, 1 for master and 1 for worker node
