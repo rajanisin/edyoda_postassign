@@ -1,0 +1,196 @@
+
+[root@ip-172-31-20-227 ec2-user]# kubectl get deployments -n palani
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+pal-deploy   1/1     1            1           5h29m
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS    RESTARTS   AGE
+pal-deploy-77967bf65b-94ddq   1/1     Running   0          5h30m
+[root@ip-172-31-20-227 ec2-user]# kubectl describe deploy pal-deploy -n palani
+Name:                   pal-deploy
+Namespace:              palani
+CreationTimestamp:      Sat, 25 Jun 2022 09:14:34 +0000
+Labels:                 app=pal-deploy
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=pal-deploy
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=pal-deploy
+  Containers:
+   nginx:
+    Image:        nginx:1.14.2
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   pal-deploy-77967bf65b (1/1 replicas created)
+Events:          <none>
+[root@ip-172-31-20-227 ec2-user]# kubectl edit deploy pal-deploy -n palani
+deployment.apps/pal-deploy edited
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS              RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   0/1     ContainerCreating   0          9s
+pal-deploy-77967bf65b-94ddq   1/1     Running             0          5h33m
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS              RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   0/1     ContainerCreating   0          10s
+pal-deploy-77967bf65b-94ddq   1/1     Running             0          5h33m
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS              RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   0/1     ContainerCreating   0          12s
+pal-deploy-77967bf65b-94ddq   1/1     Running             0          5h33m
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS        RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   1/1     Running       0          13s
+pal-deploy-77967bf65b-94ddq   1/1     Terminating   0          5h33m
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS        RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   1/1     Running       0          14s
+pal-deploy-77967bf65b-94ddq   0/1     Terminating   0          5h33m
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS    RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   1/1     Running   0          15s
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS    RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   1/1     Running   0          16s
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS    RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   1/1     Running   0          17s
+[root@ip-172-31-20-227 ec2-user]# kubectl describe deploy pal-deploy -n palani
+Name:                   pal-deploy
+Namespace:              palani
+CreationTimestamp:      Sat, 25 Jun 2022 09:14:34 +0000
+Labels:                 app=pal-deploy
+Annotations:            deployment.kubernetes.io/revision: 2
+Selector:               app=pal-deploy
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=pal-deploy
+  Containers:
+   nginx:
+    Image:        nginx:1.16.1
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   pal-deploy-55b8b68599 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  29s   deployment-controller  Scaled up replica set pal-deploy-55b8b68599 to 1
+  Normal  ScalingReplicaSet  17s   deployment-controller  Scaled down replica set pal-deploy-77967bf65b to 0
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]#
+
+
+[root@ip-172-31-20-227 ec2-user]# kubectl describe deploy pal-deploy -n palani
+Name:                   pal-deploy
+Namespace:              palani
+CreationTimestamp:      Sat, 25 Jun 2022 09:14:34 +0000
+Labels:                 app=pal-deploy
+Annotations:            deployment.kubernetes.io/revision: 2
+Selector:               app=pal-deploy
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=pal-deploy
+  Containers:
+   nginx:
+    Image:        nginx:1.16.1
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   pal-deploy-55b8b68599 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  11m   deployment-controller  Scaled up replica set pal-deploy-55b8b68599 to 1
+  Normal  ScalingReplicaSet  10m   deployment-controller  Scaled down replica set pal-deploy-77967bf65b to 0
+[root@ip-172-31-20-227 ec2-user]# clear
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]# kubectl set image deployment pal-deploy nginx=nginx:1.18.0 -n palani
+deployment.apps/pal-deploy image updated
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS              RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   1/1     Running             0          12m
+pal-deploy-97fbddff4-5496l    0/1     ContainerCreating   0          7s
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS              RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   1/1     Running             0          12m
+pal-deploy-97fbddff4-5496l    0/1     ContainerCreating   0          8s
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS              RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   1/1     Running             0          12m
+pal-deploy-97fbddff4-5496l    0/1     ContainerCreating   0          10s
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                          READY   STATUS        RESTARTS   AGE
+pal-deploy-55b8b68599-c7kgs   1/1     Terminating   0          12m
+pal-deploy-97fbddff4-5496l    1/1     Running       0          12s
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods -n palani
+NAME                         READY   STATUS    RESTARTS   AGE
+pal-deploy-97fbddff4-5496l   1/1     Running   0          15s
+[root@ip-172-31-20-227 ec2-user]# kubectl describe deploy pal-deploy -n palani
+Name:                   pal-deploy
+Namespace:              palani
+CreationTimestamp:      Sat, 25 Jun 2022 09:14:34 +0000
+Labels:                 app=pal-deploy
+Annotations:            deployment.kubernetes.io/revision: 3
+Selector:               app=pal-deploy
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=pal-deploy
+  Containers:
+   nginx:
+    Image:        nginx:1.18.0
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   pal-deploy-97fbddff4 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  12m   deployment-controller  Scaled up replica set pal-deploy-55b8b68599 to 1
+  Normal  ScalingReplicaSet  12m   deployment-controller  Scaled down replica set pal-deploy-77967bf65b to 0
+  Normal  ScalingReplicaSet  37s   deployment-controller  Scaled up replica set pal-deploy-97fbddff4 to 1
+  Normal  ScalingReplicaSet  25s   deployment-controller  Scaled down replica set pal-deploy-55b8b68599 to 0
+[root@ip-172-31-20-227 ec2-user]#
