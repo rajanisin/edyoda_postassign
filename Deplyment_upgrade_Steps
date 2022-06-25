@@ -17,7 +17,14 @@ RollingUpdateStrategy:  25% max unavailable, 25% max surge
 Pod Template:
   Labels:  app=pal-deploy
   Containers:
-# RollingUpdate strategy is 25% max unavailable, which means we need 4 replicas , so that 25% max. unavail will be 1 pod ,
-# meaning that during update single pod will go down at any instance
+  
+  
+# referring the printout during upgrade these Pods, Deployment ensures that only a certain number of Pods are down during the upgrade. 
+# it ensures that at least 75% of the number of Pods are up (meaning that only 25% can be unavailable.
+# Deployment will create new pods first, then deletes an old Pods, It does not kill old Pods until a expected number of new Pods have come up.
 
-# so deployment needs to be scale up to 4 replicas and can be upgraded. So that we can achive zero down time..
+
+
+# using kubectl edit deplyment user can upgrade the pods by change the image version in running yaml file.
+# another method is using kubectl set image command.
+
