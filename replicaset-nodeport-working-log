@@ -1,0 +1,175 @@
+
+[root@ip-172-31-20-227 pal-assesment]# vi replicaset.yaml
+[root@ip-172-31-20-227 pal-assesment]# kubectl get pods
+No resources found in default namespace.
+[root@ip-172-31-20-227 pal-assesment]# vi replicaset.yaml
+[root@ip-172-31-20-227 pal-assesment]# kubectl apply -f replicaset.yaml
+replicaset.apps/kubia created
+[root@ip-172-31-20-227 pal-assesment]# kubectl get rs
+NAME    DESIRED   CURRENT   READY   AGE
+kubia   3         3         0       7s
+[root@ip-172-31-20-227 pal-assesment]# kubectl get pods
+NAME          READY   STATUS              RESTARTS   AGE
+kubia-mtzgv   0/1     ContainerCreating   0          15s
+kubia-rf2vs   0/1     ContainerCreating   0          15s
+kubia-zqwqv   0/1     ContainerCreating   0          15s
+[root@ip-172-31-20-227 pal-assesment]# kubectl get pods
+NAME          READY   STATUS              RESTARTS   AGE
+kubia-mtzgv   0/1     ContainerCreating   0          17s
+kubia-rf2vs   0/1     ContainerCreating   0          17s
+kubia-zqwqv   0/1     ContainerCreating   0          17s
+[root@ip-172-31-20-227 pal-assesment]# kubectl get pods
+NAME          READY   STATUS              RESTARTS   AGE
+kubia-mtzgv   0/1     ContainerCreating   0          20s
+kubia-rf2vs   0/1     ContainerCreating   0          20s
+kubia-zqwqv   0/1     ContainerCreating   0          20s
+[root@ip-172-31-20-227 pal-assesment]# kubectl get pods
+NAME          READY   STATUS              RESTARTS   AGE
+kubia-mtzgv   0/1     ContainerCreating   0          23s
+kubia-rf2vs   0/1     ContainerCreating   0          23s
+kubia-zqwqv   0/1     ContainerCreating   0          23s
+[root@ip-172-31-20-227 pal-assesment]# kubectl get pods
+NAME          READY   STATUS              RESTARTS   AGE
+kubia-mtzgv   0/1     ContainerCreating   0          25s
+kubia-rf2vs   0/1     ContainerCreating   0          25s
+kubia-zqwqv   0/1     ContainerCreating   0          25s
+[root@ip-172-31-20-227 pal-assesment]# kubectl describe po kubia-mtzgv
+Name:         kubia-mtzgv
+Namespace:    default
+Priority:     0
+Node:         ip-172-31-27-96.ap-southeast-1.compute.internal/172.31.27.96
+Start Time:   Sat, 25 Jun 2022 15:27:07 +0000
+Labels:       app=kubia
+Annotations:  <none>
+Status:       Running
+IP:           192.168.190.113
+IPs:
+  IP:           192.168.190.113
+Controlled By:  ReplicaSet/kubia
+Containers:
+  kubia:
+    Container ID:   docker://bdf1243846331b89365866a915c6750ea0f38009d5d23c85e674055c9b61622f
+    Image:          luksa/kubia
+    Image ID:       docker-pullable://luksa/kubia@sha256:3f28e304dc0f63dc30f273a4202096f0fa0d08510bd2ee7e1032ce600616de24
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Sat, 25 Jun 2022 15:27:38 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-v6gs4 (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
+Volumes:
+  default-token-v6gs4:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-v6gs4
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age   From                                                      Message
+  ----    ------     ----  ----                                                      -------
+  Normal  Scheduled  35s   default-scheduler                                         Successfully assigned default/kubia-mtzgv to ip-172-31-27-96.ap-southeast-1.compute.internal
+  Normal  Pulling    34s   kubelet, ip-172-31-27-96.ap-southeast-1.compute.internal  Pulling image "luksa/kubia"
+  Normal  Pulled     4s    kubelet, ip-172-31-27-96.ap-southeast-1.compute.internal  Successfully pulled image "luksa/kubia"
+  Normal  Created    4s    kubelet, ip-172-31-27-96.ap-southeast-1.compute.internal  Created container kubia
+  Normal  Started    4s    kubelet, ip-172-31-27-96.ap-southeast-1.compute.internal  Started container kubia
+[root@ip-172-31-20-227 pal-assesment]# kubectl get pod
+NAME          READY   STATUS    RESTARTS   AGE
+kubia-mtzgv   1/1     Running   0          44s
+kubia-rf2vs   1/1     Running   0          44s
+kubia-zqwqv   1/1     Running   0          44s
+
+[root@ip-172-31-20-227 ec2-user]# cat Nodeportservice.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  type: NodePort
+  selector:
+    app: kubia
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30007
+[root@ip-172-31-20-227 ec2-user]# ls -ltr
+total 20
+drwxr-xr-x 20 root root  4096 Jun 15 05:59 kubernetes-training
+-rw-r--r--  1 root root     0 Jun 16 05:04 kubia-manual-with-labels.yaml
+-rw-r--r--  1 root root     0 Jun 16 05:26 kubia-manual.yaml
+-rwx------  1 root root 11156 Jun 23 05:36 get_helm.sh
+drwxr-xr-x  2 root root    29 Jun 25 15:26 pal-assesment
+-rw-r--r--  1 root root   177 Jun 25 16:44 Nodeportservice.yaml
+[root@ip-172-31-20-227 ec2-user]# clear
+[root@ip-172-31-20-227 ec2-user]# cat Nodeportservice.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  type: NodePort
+  selector:
+    app: kubia
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30007
+[root@ip-172-31-20-227 ec2-user]# kubectl apply -f Nodeportservice.yaml
+service/my-service created
+[root@ip-172-31-20-227 ec2-user]# kubectl get svc
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP        25h
+my-service   NodePort    10.100.166.159   <none>        80:30007/TCP   11s
+[root@ip-172-31-20-227 ec2-user]# kubectl describe my-service
+error: the server doesn't have a resource type "my-service"
+[root@ip-172-31-20-227 ec2-user]# kubectl describe svc my-service
+Name:                     my-service
+Namespace:                default
+Labels:                   <none>
+Annotations:              Selector:  app=kubia
+Type:                     NodePort
+IP:                       10.100.166.159
+Port:                     <unset>  80/TCP
+TargetPort:               8080/TCP
+NodePort:                 <unset>  30007/TCP
+Endpoints:                192.168.190.112:8080,192.168.190.113:8080,192.168.190.114:8080
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods
+NAME          READY   STATUS    RESTARTS   AGE
+kubia-mtzgv   1/1     Running   0          96m
+kubia-rf2vs   1/1     Running   0          96m
+kubia-zqwqv   1/1     Running   0          96m
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]# kubectl exec -it kubia-mtzgv bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+root@kubia-mtzgv:/# curl localhost:8080
+You've hit kubia-mtzgv
+root@kubia-mtzgv:/# exit
+exit
+[root@ip-172-31-20-227 ec2-user]# kubectl exec -it kubia-rf2vs bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+root@kubia-rf2vs:/# curl localhost:8080
+You've hit kubia-rf2vs
+root@kubia-rf2vs:/# exit
+exit
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.112:8080
+You've hit kubia-zqwqv
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.113:8080
+You've hit kubia-mtzgv
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.114:8080
+You've hit kubia-rf2vs
