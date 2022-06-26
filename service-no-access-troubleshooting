@@ -1,0 +1,183 @@
+Some common issues the would be,
+
+app pod in not running due to various reason memory , no nodes avail. (taints, node down), 
+---
+Specific to Accessing the Pod,
+app is listening on the wrong ports or user configured the wrong port (port not that listening by the app)
+App is listening on the wrong interface 
+Wrong configuration of the service/app.
+
+---------
+
+Troubleshooting:
+
+Common troubleshooting steps are checking the pod, node, service status.
+
+Here I'm going to change the port(target port) to wrong one. and trying to access the app.
+ - from external - should Fail
+ - from the AWS cloud using curl the endpoints - should fail
+ - from the pod itself by curl the app using target port - should fail
+ 
+ attaching the Log below:
+ 
+ [root@ip-172-31-20-227 ec2-user]# kubectl get pods
+NAME          READY   STATUS    RESTARTS   AGE
+kubia-mtzgv   1/1     Running   0          11h
+kubia-rf2vs   1/1     Running   0          11h
+kubia-zqwqv   1/1     Running   0          11h
+[root@ip-172-31-20-227 ec2-user]# kubectl get svc
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP        36h
+my-service   NodePort    10.100.166.159   <none>        80:30007/TCP   10h
+[root@ip-172-31-20-227 ec2-user]# kubectl describe svc my-service
+Name:                     my-service
+Namespace:                default
+Labels:                   <none>
+Annotations:              Selector:  app=kubia
+Type:                     NodePort
+IP:                       10.100.166.159
+Port:                     <unset>  80/TCP
+TargetPort:               8080/TCP
+NodePort:                 <unset>  30007/TCP
+Endpoints:                192.168.190.112:8080,192.168.190.113:8080,192.168.190.114:8080
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.112:8080
+You've hit kubia-zqwqv
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.113:8080
+You've hit kubia-mtzgv
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.114:8080
+You've hit kubia-rf2vs
+[root@ip-172-31-20-227 ec2-user]# kubect exec -it kubia-mtzgv bash
+bash: kubect: command not found
+[root@ip-172-31-20-227 ec2-user]# kubectl exec -it kubia-mtzgv bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+root@kubia-mtzgv:/# curl localhost:8080
+You've hit kubia-mtzgv
+root@kubia-mtzgv:/# exit
+exit
+[root@ip-172-31-20-227 ec2-user]# kubectl exec -it kubia-rf2vs bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+root@kubia-rf2vs:/# curl localhost:8080
+You've hit kubia-rf2vs
+root@kubia-rf2vs:/# exit
+exit
+[root@ip-172-31-20-227 ec2-user]# kubectl exec -it kubia-zqwqv bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+root@kubia-zqwqv:/# curl localhost:8080
+You've hit kubia-zqwqv
+root@kubia-zqwqv:/# exit
+exit
+--------------------------------
+
+[root@ip-172-31-20-227 ec2-user]# vi svc.yaml
+[root@ip-172-31-20-227 ec2-user]# kubectl edit svc my-service
+service/my-service edited
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]# kubectl describe svc my-service
+Name:                     my-service
+Namespace:                default
+Labels:                   <none>
+Annotations:              Selector:  app=kubia
+Type:                     NodePort
+IP:                       10.100.166.159
+Port:                     <unset>  80/TCP
+TargetPort:               80/TCP
+NodePort:                 <unset>  30007/TCP
+Endpoints:                192.168.190.112:80,192.168.190.113:80,192.168.190.114:80
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.112:80
+curl: (7) Failed to connect to 192.168.190.112 port 80 after 0 ms: Connection refused
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.113:80
+curl: (7) Failed to connect to 192.168.190.113 port 80 after 0 ms: Connection refused
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.114:80
+curl: (7) Failed to connect to 192.168.190.114 port 80 after 0 ms: Connection refused
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods
+NAME          READY   STATUS    RESTARTS   AGE
+kubia-mtzgv   1/1     Running   0          12h
+kubia-rf2vs   1/1     Running   0          12h
+kubia-zqwqv   1/1     Running   0          12h
+[root@ip-172-31-20-227 ec2-user]# kubectl exec -it kubia-mtzgv bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+root@kubia-mtzgv:/# curl localhost:80
+curl: (7) Failed to connect to localhost port 80: Connection refused
+root@kubia-mtzgv:/# exit
+exit
+command terminated with exit code 7
+[root@ip-172-31-20-227 ec2-user]# kubectl exec -it kubia-rf2vs bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+root@kubia-rf2vs:/# curl localhost:80
+curl: (7) Failed to connect to localhost port 80: Connection refused
+root@kubia-rf2vs:/# exit
+exit
+command terminated with exit code 7
+[root@ip-172-31-20-227 ec2-user]# kubectl exec -it kubia-zqwqv bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+root@kubia-zqwqv:/# curl localhost:80
+curl: (7) Failed to connect to localhost port 80: Connection refused
+
+
+# Changed the target port to wrong port in service. The app not able to access inside the pod, nor with endpoint , not able to access externally as well.
+
+
+
+# The port reverted back to actual listening port by the app. Now the app is accessibile from internal and external as well.
+
+[root@ip-172-31-20-227 ec2-user]#
+[root@ip-172-31-20-227 ec2-user]# kubectl edit svc my-service
+service/my-service edited
+[root@ip-172-31-20-227 ec2-user]# kubectl edit svc my-service
+Edit cancelled, no changes made.
+[root@ip-172-31-20-227 ec2-user]# kubectl describe svc my-service
+Name:                     my-service
+Namespace:                default
+Labels:                   <none>
+Annotations:              Selector:  app=kubia
+Type:                     NodePort
+IP:                       10.100.166.159
+Port:                     <unset>  8080/TCP
+TargetPort:               8080/TCP
+NodePort:                 <unset>  30007/TCP
+Endpoints:                192.168.190.112:8080,192.168.190.113:8080,192.168.190.114:8080
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.112:8080
+You've hit kubia-zqwqv
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.113:8080
+You've hit kubia-mtzgv
+[root@ip-172-31-20-227 ec2-user]# curl 192.168.190.114:8080
+You've hit kubia-rf2vs
+[root@ip-172-31-20-227 ec2-user]# kubectl get pods
+NAME          READY   STATUS    RESTARTS   AGE
+kubia-mtzgv   1/1     Running   0          12h
+kubia-rf2vs   1/1     Running   0          12h
+kubia-zqwqv   1/1     Running   0          12h
+[root@ip-172-31-20-227 ec2-user]# kubectl exec -it kubia-mtzgv bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+root@kubia-mtzgv:/# curl localhost:8080
+You've hit kubia-mtzgv
+root@kubia-mtzgv:/# exit
+exit
+[root@ip-172-31-20-227 ec2-user]# kubectl exec -it kubia-rf2vs bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+root@kubia-rf2vs:/# curl localhost:8080
+You've hit kubia-rf2vs
+root@kubia-rf2vs:/# exit
+exit
+[root@ip-172-31-20-227 ec2-user]# kubectl exec -it kubia-zqwqv bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+root@kubia-zqwqv:/# curl localhost:8080
+You've hit kubia-zqwqv
+root@kubia-zqwqv:/# exit
+exit
+
+ 
+
+
+
